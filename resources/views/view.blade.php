@@ -63,7 +63,7 @@
         margin-bottom: 30px;
     }
 </style>
-<a href="/">Back</a>
+<a href="/">Home</a>
 <h1>
     {{ $model->getRoute->directionFrom->title .' to '. $model->getRoute->directionTo->title }}
 </h1>
