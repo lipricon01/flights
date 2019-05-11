@@ -12,6 +12,7 @@
 */
 
 Route::get('/', 'SiteController@index');
+Route::get('/view/{id}', 'SiteController@view' );
 
 
 Route::group(['prefix' => 'admin'], function () {

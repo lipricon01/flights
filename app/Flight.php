@@ -14,11 +14,18 @@ use App\Route;
  */
 class Flight extends Model
 {
+    protected $table = 'flights';
+
     protected $fillable =[
-            'direction_id',
+            'route_id',
             'flightJson',
         ];
 
+
+    public function getRoute()
+    {
+        return $this->belongsTo(Route::class, 'route_id', 'id');
+    }
 
     public  function getFlights(Route $route)
     {
@@ -33,10 +40,10 @@ class Flight extends Model
 
         $cheapestArray =$this->getCheapestFlights($flightsArray);
 
-        $flight = self::where(['direction_id' => $route->id])->first();
+        $flight = self::where(['route_id' => $route->id])->first();
         if (is_null($flight)) {
             $flight = new Flight();
-            $flight->direction_id = $route->id;
+            $flight->route_id = $route->id;
         }
         $flight->flightJson = $this->validateFlights($cheapestArray);
         $flight->save();

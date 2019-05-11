@@ -8,20 +8,25 @@
 
 namespace App\Http\Controllers;
 
-
-use App\Direction;
 use App\Flight;
-use App\Helpers\HttpClientHelper;
-use App\Route;
-use Carbon\Carbon;
-use GuzzleHttp\Client;
 
 class SiteController extends Controller
 {
+
     public function index()
     {
         $models = Flight::all();
 
         return view('welcome', compact('models'));
     }
+
+    public function view($id)
+    {
+
+        $model = Flight::where(['id' => $id])->first();
+
+        return view('view', compact('model'));
+
+    }
+
 }
