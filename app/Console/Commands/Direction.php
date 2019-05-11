@@ -40,9 +40,17 @@ class Direction extends Command
     public function handle()
     {
         $routes = Route::all();
-        foreach ($routes as $index => $route) {
-            (new Flight)->getFlights($route);
+        try {
+            foreach ($routes as $index => $route) {
+                (new Flight)->getFlights($route);
+            }
+        } catch (\Exception $exception) {
+            $this->error('Something gone wrong');
+            $this->error($exception->getMessage());
+            return 2;
         }
+        $this->info('Flights have been updated');
+        return 0;
     }
 
 }
