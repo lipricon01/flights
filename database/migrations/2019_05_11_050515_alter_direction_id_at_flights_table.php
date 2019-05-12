@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class AlterDirectionIdAtFlightsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+
+        Schema::table('flights', function (Blueprint $table) {
+            $table->renameColumn('direction_id', 'route_id');
+        });
+
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+
+        Schema::table('flights', function (Blueprint $table) {
+            $table->renameColumn('route_id', 'direction_id');
+        });
+
+    }
+}

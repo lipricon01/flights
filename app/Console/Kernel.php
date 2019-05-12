@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Console\Commands\CheckFlights;
+use App\Console\Commands\Direction;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -13,7 +15,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Direction::class,
+        CheckFlights::class
     ];
 
     /**
@@ -24,8 +27,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $schedule->command('direction')->daily();
+        $schedule->command('flight')->hourly();
     }
 
     /**
