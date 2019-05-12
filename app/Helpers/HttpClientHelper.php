@@ -43,7 +43,6 @@ class HttpClientHelper
     {
         $final_date = Carbon::now()->addMonth('1')->format('j/n/Y');
         $response = $this->client->get('https://api.skypicker.com/flights?fly_from=' . $from . '&fly_to=' . $to . '&date_from=' . date('j/n/Y') . '&date_to=' . $final_date . '&adults=1&infants=1');
-
         return $response;
     }
 

@@ -9,7 +9,6 @@
 namespace App\Http\Controllers;
 
 use App\Flight;
-use App\Route;
 
 class SiteController extends Controller
 {
@@ -22,8 +21,7 @@ class SiteController extends Controller
         return view('welcome', compact('models'));
     }
 
-    public
-    function view($id)
+    public function view($id)
     {
 
         $model = Flight::where(['id' => $id])->first();

@@ -47,8 +47,11 @@ class Flight extends Model
         }
 
         $cheapestArray = $this->getCheapestFlights($flightsArray);
+
         $flights = $this->validateFlights($cheapestArray, $route->id);
+
         $flight = self::where(['route_id' => $route->id])->first();
+
         if (is_null($flight)) {
             $flight = new Flight();
             $flight->route_id = $route->id;
@@ -85,21 +88,19 @@ class Flight extends Model
     public function validateFlights($flightsArray, $route_id)
     {
         $urlArray = [];
+
         //form array
         foreach ($flightsArray as $index => $item) {
-            $urlArray[] =
-                [
-                    'date' => $index,
-                    'price' => $item['price'],
-                    'booking_token' => $item['booking_token'],
-                    'url' => 'https://booking-api.skypicker.com/api/v0.1/check_flights?v=2&booking_token=' . $item['booking_token'] . '&currency=USD&&adults=1&children=0&infants=1&bnum=1'
-                ];
+            $urlArray[] = [
+                'date' => $index,
+                'price' => $item['price'],
+                'booking_token' => $item['booking_token'],
+                'url' => 'https://booking-api.skypicker.com/api/v0.1/check_flights?v=2&booking_token=' . $item['booking_token'] . '&currency=USD&&adults=1&children=0&infants=1&bnum=1'
+            ];
         }
 
-        //sleep 5 потому что api не выдерживает ассинхронные запросы, мб еще уыеличится
-        sleep(5);
+        //sleep 5 потому что api не выдерживает ассинхронные запросы
         $response = (new HttpClientHelper($route_id))->sendToValidate(collect($urlArray)->chunk(5));
-
 
         return json_encode($response);
     }
