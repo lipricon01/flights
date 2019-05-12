@@ -67,9 +67,9 @@
 <h1>
     {{ $model->getRoute->directionFrom->title .' to '. $model->getRoute->directionTo->title }}
 </h1>
-@foreach(json_decode($model->flightJson) as $index => $flight)
+@foreach(json_decode($model->flightJson) as $flight)
     <div class="">
-        Date - <b> {{ $index }}</b>
+        Date - <b> {{ $flight->date }}</b>
         Price - <b> {{ $flight->price}} </b>
         Price change - <b>{{ $flight->price_change === false ? 'false' : 'true'}}</b>
         Flight checked - <b>{{ $flight->flights_checked  === false ? 'false' : 'true'}}</b>

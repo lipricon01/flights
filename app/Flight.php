@@ -8,18 +8,20 @@ use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Model;
 use App\Route;
+
 /**
- * @property int direction_id
+ * @property int route_id
  * @property string flightJson
+ * @property Route getRoute
  */
 class Flight extends Model
 {
     protected $table = 'flights';
 
-    protected $fillable =[
-            'route_id',
-            'flightJson',
-        ];
+    protected $fillable = [
+        'route_id',
+        'flightJson',
+    ];
 
 
     public function getRoute()
@@ -27,32 +29,45 @@ class Flight extends Model
         return $this->belongsTo(Route::class, 'route_id', 'id');
     }
 
-    public  function getFlights(Route $route)
+    /**
+     * Get flights by route
+     * @param \App\Route $route
+     * @return boolean
+     */
+    public function getFlights(Route $route)
     {
-        $response = HttpClientHelper::getFlights($route->directionFrom->code, $route->directionTo->code);
+        $response = (new HttpClientHelper($route->id))->getFlights($route->directionFrom->code, $route->directionTo->code);
         $body = FormatterHelper::formatBody($response);
         $allFlights = $body->data;
+
         $flightsArray = [];
         foreach ($allFlights as $index => $flight) {
             $date = Carbon::createFromTimestamp($flight->dTimeUTC)->toDateString();
             $flightsArray[$date][] = $flight;
         }
 
-        $cheapestArray =$this->getCheapestFlights($flightsArray);
-
+        $cheapestArray = $this->getCheapestFlights($flightsArray);
+        $flights = $this->validateFlights($cheapestArray, $route->id);
         $flight = self::where(['route_id' => $route->id])->first();
         if (is_null($flight)) {
             $flight = new Flight();
             $flight->route_id = $route->id;
         }
-        $flight->flightJson = $this->validateFlights($cheapestArray);
-        $flight->save();
+        $flight->flightJson = $flights;
+        if ($flight->save()) {
+            return true;
+        }
 
-        return $cheapestArray;
+        return false;
     }
 
-    //find and form array of Cheapest Flights
-    public  function getCheapestFlights($flightsArray)
+
+    /**
+     * find and form array of Cheapest Flights
+     * @param $flightsArray
+     * @return array
+     */
+    public function getCheapestFlights($flightsArray)
     {
         $cheapestArray = [];
         foreach ($flightsArray as $index => $items) {
@@ -67,21 +82,26 @@ class Flight extends Model
     }
 
 
-    public function validateFlights($flightsArray)
+    public function validateFlights($flightsArray, $route_id)
     {
-        $totalArray = [];
+        $urlArray = [];
+        //form array
         foreach ($flightsArray as $index => $item) {
-            $response = HttpClientHelper::validateFlights($item['booking_token']);
-            $data = FormatterHelper::formatBody($response);
-            $totalArray[$index] = [
-                'price' => $item['price'],
-                'booking_token' => $item['booking_token'],
-                'flights_invalid' => $data->flights_invalid,
-                'price_change' => $data->price_change,
-                'flights_checked' => $data->flights_checked
-            ];
+            $urlArray[] =
+                [
+                    'date' => $index,
+                    'price' => $item['price'],
+                    'booking_token' => $item['booking_token'],
+                    'url' => 'https://booking-api.skypicker.com/api/v0.1/check_flights?v=2&booking_token=' . $item['booking_token'] . '&currency=USD&&adults=1&children=0&infants=1&bnum=1'
+                ];
         }
-        return json_encode($totalArray);
+
+        //sleep 5 потому что api не выдерживает ассинхронные запросы, мб еще уыеличится
+        sleep(5);
+        $response = (new HttpClientHelper($route_id))->sendToValidate(collect($urlArray)->chunk(5));
+
+
+        return json_encode($response);
     }
 
 

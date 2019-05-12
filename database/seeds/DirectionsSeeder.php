@@ -29,6 +29,7 @@ class DirectionsSeeder extends Seeder
             ['from' => 'ALA', 'to' => 'CIT'],
             ['from' => 'CIT', 'to' => 'ALA'],
             ['from' => 'MOW', 'to' => 'TSE'],
+            ['from' => 'TSE', 'to' => 'MOW'],
             ['from' => 'TSE', 'to' => 'LED'],
             ['from' => 'LED', 'to' => 'TSE'],
         ];
@@ -46,5 +47,6 @@ class DirectionsSeeder extends Seeder
             $model->fly_to = (\App\Direction::where(['code' => $route['to']])->first())->id;
             $model->save();
         }
+
     }
 }
